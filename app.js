@@ -1,3 +1,5 @@
+const cors = require('cors');
+
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./routes/authRoutes');
@@ -9,6 +11,14 @@ const app = express();
 app.use(express.static('public'));
 app.use(express.json());
 app.use(cookieParser())
+
+const corsOptions ={
+  origin:'http://localhost:5174', 
+  credentials:true,            //access-control-allow-credentials:true
+  optionSuccessStatus:200
+}
+
+app.use(cors(corsOptions));
 
 // view engine
 app.set('view engine', 'ejs');
