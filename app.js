@@ -1,16 +1,21 @@
+require('dotenv').config()
+
 const cors = require('cors');
+const express = require('express')
+const mongoose = require('mongoose')
+const userRoutes = require('./routes/authRoutes')
+const locationRoutes = require('./routes/locationRoutes')
 
-const express = require('express');
-const mongoose = require('mongoose');
-const authRoutes = require('./routes/authRoutes');
-const cookieParser = require('cookie-parser')
-
-const app = express();
+// express app
+const app = express()
 
 // middleware
-app.use(express.static('public'));
-app.use(express.json());
-app.use(cookieParser())
+app.use(express.json())
+
+app.use((req, res, next) => {
+  console.log(req.path, req.method)
+  next()
+})
 
 const corsOptions ={
   origin:'http://localhost:5174', 
@@ -20,40 +25,30 @@ const corsOptions ={
 
 app.use(cors(corsOptions));
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 // view engine
 app.set('view engine', 'ejs');
 
-// database connection
-// const dbURI = 'mongodb+srv://shaun:test1234@cluster0.del96.mongodb.net/node-auth';
-// const dbURI1 = 'mongodb+srv://samuelstifnes:AwtnIM32YjHTXygp@authcluster.bzruh0j.mongodb.net/node-auth';
-const dbURI = 'mongodb+srv://samuelstifnes:AwtnIM32YjHTXygp@authcluster.bzruh0j.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp';
-mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then((result) => {
-    app.listen(3000)
-  } 
-  )
-  .catch((err) => console.log('DB not Connected', err));
-
 // routes
+app.use(userRoutes)
+app.use(locationRoutes)
 app.get('/', (req, res) => res.render('home'));
-app.get('/smoothies', (req, res) => res.render('smoothies'));
 
-// cookies
+// connect to db
+const dbURI = 'mongodb+srv://samuelstifnes:AwtnIM32YjHTXygp@authcluster.bzruh0j.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp';
 
-app.get('/set-cookies', (req, res) => {
-  //res.setHeader('Set-Cookie', 'newUser=true')
-
-   res.cookie('newUser', false)
-
-  res.send('you got the cookies')
-})
-
-app.get('/get-cookies', (req, res) => {
-  const cookies = req.cookies;
-
-  console.log(cookies);
-
-  res.json(cookies.newUser)
-})
-
-app.use(authRoutes) 
+mongoose.connect(dbURI ,{ useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    // listen for requests
+    app.listen(3000, () => {
+      console.log('connected to db & listening on port', 3000)
+    })
+  })
+  .catch((error) => {
+    console.log(error)
+  })
