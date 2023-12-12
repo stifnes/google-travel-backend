@@ -1,0 +1,61 @@
+<%- include('partials/header'); -%>
+
+<header>
+  <div class="headings">
+    <h1>
+      <%= location.name %>
+    </h1> 
+    <h1>
+      <%= location.country %>
+    </h1> 
+    <button onclick="handleDeleteLocation('<%= location._id %>')">DELETE Location</button>
+    <!-- <a href="/location/edit/<%= location._id %>">Update Location</button> -->
+    <h2>Add place</h2>
+    <form action="/location/<%= location._id %>/places" method="POST" enctype="multipart/form-data">
+      <label for="name">Place Name:</label>
+      <input type="text" id="name" name="name" required><br><br>
+      
+      <label for="description">Description:</label>
+      <textarea id="description" name="description" required></textarea><br><br>
+      
+      <label for="image">Image</label>
+      <input type="file" id="image" name="image" required><br><br>
+      
+      <label for="price">Price:</label>
+      <input type="text" id="price" name="price" required><br><br>
+      
+      <label for="rating">Rating:</label>
+      <input type="text" id="rating" name="rating" required><br><br>
+      
+      <label for="placeType">Place Type:</label>
+      <input type="text" id="placeType" name="placeType" required><br><br>
+      
+      <button type="submit">Add Place</button>
+    </form>
+  </div>
+</header>
+
+<script>
+  const handleDeleteLocation = (locationId) => {
+    fetch(`/location/${locationId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      if (response.ok) {
+        // Handle successful deletion
+        alert('Location deleted successfully');
+        window.location.replace("/")
+        // Perform any additional actions after successful deletion
+      } else {
+        // Handle errors if the deletion was not successful
+        console.error('Failed to delete location');
+      }
+    })
+    .catch(error => console.error('Error:', error));
+  }
+</script>
+
+<%- include('partials/footer'); -%>

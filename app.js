@@ -5,6 +5,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const userRoutes = require('./routes/authRoutes')
 const locationRoutes = require('./routes/locationRoutes')
+const bodyParser = require('body-parser');
 
 // express app
 const app = express()
@@ -12,13 +13,18 @@ const app = express()
 // middleware
 app.use(express.json())
 
+app.use(express.static(__dirname + '/public'));
+
 app.use((req, res, next) => {
   console.log(req.path, req.method)
   next()
 })
 
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 const corsOptions ={
-  origin:'http://localhost:5174', 
+  origin:'http://localhost:5173', 
   credentials:true,            //access-control-allow-credentials:true
   optionSuccessStatus:200
 }
@@ -37,7 +43,8 @@ app.set('view engine', 'ejs');
 // routes
 app.use(userRoutes)
 app.use(locationRoutes)
-app.get('/', (req, res) => res.render('home'));
+app.get('/', (req, res) =>  res.render('home'));
+
 
 // connect to db
 const dbURI = 'mongodb+srv://samuelstifnes:AwtnIM32YjHTXygp@authcluster.bzruh0j.mongodb.net/?retryWrites=true&w=majority&appName=AtlasApp';

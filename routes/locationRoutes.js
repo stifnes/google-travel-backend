@@ -4,29 +4,39 @@ const {
   getLocations,
   getLocation,
   deleteLocation,
-  updateLocation
+  createPlace,
+  getLocationPublic,
+  getPublicLocations,
 } = require('../controllers/locationController')
 const requireAuth = require('../middleware/requireAuth')
+const multer = require('multer');
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const router = express.Router()
 
-// require auth for all workout routes
-router.use(requireAuth)
+// require auth for all locations routes
+// router.use(requireAuth)
 
-// GET all workouts
+// GET all locations
 router.get('/', getLocations)
+// GET all locations for Frontend Public app
+router.get('/public/v1', getPublicLocations)
 
-//GET a single workout
-router.get('/:id', getLocation)
+//GET a single location
+router.get('/location/:id', getLocation)
+// GET one locations for Frontend Public app
+router.get('/public/v1/location/:id', getLocationPublic)
 
-// POST a new workout
-router.post('/', createLocation)
+// POST a new location
+router.post('/',upload.single('image'), createLocation)
 
-// DELETE a workout
-router.delete('/:id', deleteLocation)
+// DELETE a location
+router.delete('/location/:id', deleteLocation)
 
-// UPDATE a workout
-router.patch('/:id', updateLocation)
+// POST a new place in the location
+router.post('/location/:id/places',upload.single('image'), createPlace)
 
 
 module.exports = router
